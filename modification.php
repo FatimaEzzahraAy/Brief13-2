@@ -1,16 +1,46 @@
 <?php include("./connexion.php"); 
- if ($_SERVER["REQUEST_METHOD"]=="POST") {
-    global $id;
-    $id = htmlspecialchars($_REQUEST["modifierCarte"]); 
-          echo $id; 
-              $requeteSMod ="SELECT TitreAnnonce,ImageAnnonce,DescriptionAnnonce,AdresseAnnonce,SuperficieAnnonce,MontantAnnonce,DateAnnonce,TypeAnnonce FROM annonce where IdAnnonce=$id";
-              
-              $resultatRSMod = $dbco->prepare($requeteSMod);
-              
-          if ($resultatRSMod->execute()) {
-                  $ligneSMod = $resultatRSMod -> fetch(PDO::FETCH_ASSOC);
-          }
+ if(isset($_GET["id"])){
+    $id= $_GET["id"];
+    $requeteSMod ="SELECT * FROM annonce WHERE IdAnnonce=$id";
+    $resultatRSMod = $dbco->prepare($requeteSMod);
+    $resultatRSMod->execute();
+    $ligneSMod = $resultatRSMod -> fetch(PDO::FETCH_ASSOC);
+
+    if(isset($_POST['modifier'])){
+                           
+        $titre =$_POST["titre"];
+        $desc = $_POST["description"];
+        $sup =$_POST["superficie"];
+        $add = $_POST["adresse"];
+        $montant = $_POST["montant"];
+        $date = $_POST["date"];
+        $type = $_POST["type"];
+        //image
+        $img = $_FILES["image"]["name"];
+        $fileExtension = explode('.', $img);     
+        $fileExtension = end($fileExtension);     
+        $allowedExtensions = array('jpg', 'png', 'jpeg','jfif');
+        $img = uniqid('', true). ".$fileExtension"; 
+        $tempname = $_FILES['image']['tmp_name'];
+        $folder = "./img/" . $img;
+        move_uploaded_file($tempname, $folder);
+    
+        if(!empty($titre && $img && $desc && $sup && $add && $montant && $date && $type))
+        { 
+            if(strlen($titre) < 200 && strlen($desc) > 3  && strlen($add) > 3 && $sup > 0 && $montant > 0){
+                echo "mise à jour avec succées";
+                $requeteModifier = "UPDATE `annonce` SET `TitreAnnonce` = '$titre' , `ImageAnnonce`='$img' , `DescriptionAnnonce`='$desc' , `SuperficieAnnonce`= $sup , `AdresseAnnonce`='$add' , `MontantAnnonce`= $montant , `DateAnnonce`='$date' , `TypeAnnonce`='$type' WHERE `IdAnnonce` = $id";
+                $ResultatrequeteModifier =$dbco->prepare($requeteModifier);
+                if($ResultatrequeteModifier->execute()){
+                   header("location:./index.php");
+                }
+                
+            }
         }
+    }
+}
+            
+        
 ?>
 <!doctype html>
 <html lang="en">
@@ -20,7 +50,6 @@
     <title>IMMO HORIZON | Modification</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-    <script defer src="./javascript.js"></script>
   </head>   
     <body>
         <header class="container-fluid bg-dark fixed-top mb-1">
@@ -99,35 +128,7 @@
                                 </div>         
                     <?php
                     
-                        if(isset($_GET['modifier'])){
-                           
-                            $titre =$_POST["titre"];
-                            $desc = $_POST["description"];
-                            $sup =$_POST["superficie"];
-                            $add = $_POST["adresse"];
-                            $montant = $_POST["montant"];
-                            $date = $_POST["date"];
-                            $type = $_POST["type"];
-                            //image
-                            $img = $_FILES["image"]["name"];
-                            $fileExtension = explode('.', $img);     
-                            $fileExtension = end($fileExtension);     
-                            $allowedExtensions = array('jpg', 'png', 'jpeg','jfif');
-                            $img = uniqid('', true). ".$fileExtension"; 
-                            $tempname = $_FILES['image']['tmp_name'];
-                            $folder = "./img/" . $img;
-                            move_uploaded_file($tempname, $folder);
-                        
-                            if(!empty($titre && $img && $desc && $sup && $add && $montant && $date && $type))
-                            { 
-                                if(strlen($titre) < 200 && strlen($desc) > 3  && strlen($add) > 3 && $sup > 0 && $montant > 0){
-                                    echo "mise à jour avec succées";
-                                    $requeteModifier = "UPDATE `annonce` SET `TitreAnnonce` = '$titre' , `ImageAnnonce`='$img' , `DescriptionAnnonce`='$desc' , `SuperficieAnnonce`= $sup , `AdresseAnnonce`='$add' , `MontantAnnonce`= $montant , `DateAnnonce`='$date' , `TypeAnnonce`='$type' WHERE `IdAnnonce` = $id";
-                                    $dbco->exec($requeteModifier); 
-                                    
-                                }
-                            }
-                        }
+                      
                 ?>
             </section>
         </main>

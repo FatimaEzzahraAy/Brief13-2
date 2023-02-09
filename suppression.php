@@ -1,4 +1,8 @@
-<?php include("./connexion.php"); ?>
+<?php include("./connexion.php");
+if(isset($_GET["id"])){
+    $id= $_GET["id"];  
+}
+?>
 <!doctype html>
 <html lang="en">
   <head>
@@ -7,7 +11,6 @@
     <title>IMMO HORIZON | Suppression</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-    <script defer src="./javascript.js"></script>
   </head>   
     <body>
         <header class="container-fluid bg-dark fixed-top mb-1">
@@ -53,15 +56,13 @@
         <?php
         
         if (isset($_POST["supprimer"])) {
-            echo "Suppression avec succés";
-            if ($_SERVER["REQUEST_METHOD"]=="POST") {
-            $id = htmlspecialchars($_REQUEST["supprimerCarte"]); 
-                echo $id; 
+            
                 $requeteSSup ="DELETE FROM `annonce` WHERE `IdAnnonce` = $id";
                 $resultatRSSup = $dbco->prepare($requeteSSup);
                 $resultatRSSup->execute(); 
+                header("location:./index.php");
         }
-        }
+        
         ?>
         
 
